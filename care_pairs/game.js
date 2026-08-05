@@ -29,7 +29,6 @@ const musicBtn = document.getElementById('musicBtn');
 const musicLabel = document.getElementById('musicLabel');
 const confettiCanvas = document.getElementById('confetti');
 
-const LS_SCORES = 'cuidese-scores';
 const LS_DIFF = 'cuidese-diff';
 const LS_NAME = 'cuidese-name';
 
@@ -283,62 +282,78 @@ function selectDifficulty(diff, src) {
   }
 }
 
-/* --- Leaderboard --- */
-function getScores() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(LS_SCORES) || '[]');
-    if (Array.isArray(raw)) return raw;
-  } catch (e) {}
-  return [];
-}
+/* --- Leaderboard (Integração com Vercel API + Supabase) --- */
 
-function saveScore() {
+async function saveScore() {
   const name = (victoryNameInput.value.trim() || 'Jogador(a)').slice(0, 20);
   playerName = name;
   localStorage.setItem(LS_NAME, name);
-  const entry = {
-    name,
-    score: rankScore(),
-    pairs: S.matched,
-    attempts: S.attempts,
-    time: S.seconds,
-    diff: difficulty,
-    diffLabel: S.config.label,
-    date: Date.now(),
-  };
-  const scores = getScores();
-  scores.push(entry);
-  scores.sort((a, b) => b.score - a.score);
-  localStorage.setItem(LS_SCORES, JSON.stringify(scores.slice(0, 50)));
-  showLeaderboard();
+
+  const finalScore = rankScore();
+
+  if (saveBtn) saveBtn.disabled = true;
+
+  try {
+    const response = await fetch('/api/ranking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: name,
+        pontuacao: finalScore
+      })
+    });
+
+    if (response.ok) {
+      victoryOverlay.classList.remove('show');
+      await showLeaderboard();
+    } else {
+      const errData = await response.json();
+      alert(`Erro ao salvar pontuação: ${errData.error || 'Erro desconhecido'}`);
+    }
+  } catch (err) {
+    console.error('Erro na requisição:', err);
+    alert('Não foi possível conectar ao servidor para salvar a pontuação.');
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
+  }
 }
 
-const DIFF_COLOR = { facil: '#E6007E', medio: '#002A54', dificil: '#8A6FE8' };
+async function showLeaderboard() {
+  rankList.innerHTML = '<li class="rank-empty">Carregando ranking global...</li>';
+  leaderboardOverlay.classList.add('show');
 
-function showLeaderboard() {
-  const scores = getScores().slice(0, 10);
-  rankList.innerHTML = '';
-  if (scores.length === 0) {
-    const li = document.createElement('li');
-    li.className = 'rank-empty';
-    li.textContent = 'Nenhum resultado ainda. Seja a primeira!';
-    rankList.appendChild(li);
-  } else {
-    scores.forEach((s, i) => {
+  try {
+    const response = await fetch('/api/ranking');
+    const data = await response.json();
+
+    rankList.innerHTML = '';
+
+    if (!data.ranking || data.ranking.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'rank-empty';
+      li.textContent = 'Nenhum resultado ainda. Seja a primeira!';
+      rankList.appendChild(li);
+      return;
+    }
+
+    data.ranking.forEach((s, i) => {
       const li = document.createElement('li');
       li.className = 'rank-item';
       if (i === 0) li.classList.add('rank-top');
+
       const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}º`;
+
       li.innerHTML = `
         <span class="rank-medal">${medal}</span>
-        <span class="rank-color" style="background:${DIFF_COLOR[s.diff] || '#E6007E'}"></span>
-        <span class="rank-name">${s.name}</span>
-        <span class="rank-detail">${s.pairs} pares · ${s.attempts} tent.</span>
-        <b class="rank-score">${s.score}</b>`;
+        <span class="rank-name">${s.nome || 'Anônimo'}</span>
+        <b class="rank-score">${s.pontuacao} pts</b>`;
+
       rankList.appendChild(li);
     });
+  } catch (err) {
+    console.error('Erro ao buscar o ranking:', err);
+    rankList.innerHTML = '<li class="rank-empty">Erro ao carregar o ranking global.</li>';
   }
-  leaderboardOverlay.classList.add('show');
 }
 
 /* --- Difficulty selectors --- */
