@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuide-se!</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='%23002A54'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%23E6007E' stroke-width='2.4'/%3E%3Ctext x='32' y='37' font-family='sans-serif' font-size='12' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%E2%99%A5%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="blob blob-1" aria-hidden="true"></div>
+  <div class="blob blob-2" aria-hidden="true"></div>
+  <div class="blob blob-3" aria-hidden="true"></div>
+
+  <div class="app">
+    <header class="header">
+      <div class="senac-logo">
+        <img src="assets/senac.png" alt="SENAC" />
+      </div>
+      <h1 class="title">
+        <span class="title-badge" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="28" fill="#002A54"/>
+            <circle cx="32" cy="32" r="22" fill="none" stroke="#E6007E" stroke-width="2.4"/>
+            <text x="32" y="39" font-family="sans-serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle">♥</text>
+          </svg>
+        </span>
+        Cuide-se!
+      </h1>
+      <div class="header-row">
+        <div class="stats">
+          <div class="stat" title="Tempo">
+            <svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" /><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span id="timer">00:00</span>
+          </div>
+          <div class="stat" title="Pontos">
+            <svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6 .9-4.3 4.2 1 6L12 17l-5.4 2.7 1-6L3.3 9.5l6-.9z" fill="currentColor" /></svg>
+            <span id="score">0</span>
+          </div>
+          <div class="stat" title="Jogadas">
+            <svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v5h5M20 20v-5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 13a8 8 0 0 1 14-5l2 2M20 11a8 8 0 0 1-14 5l-2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            <span id="attempts">0</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="leaderboardBtn" class="icon-btn" title="Ver Ranking" aria-label="Ver Ranking">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="9" width="4" height="11" rx="1" fill="currentColor" /><rect x="10" y="4" width="4" height="16" rx="1" fill="currentColor" /><rect x="16" y="12" width="4" height="8" rx="1" fill="currentColor" /></svg>
+          </button>
+          <button id="musicBtn" class="btn btn-music" aria-pressed="false" title="Música ambiente">
+            <svg class="music-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l10-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="6.5" cy="18" r="2.5" fill="currentColor" /><circle cx="16.5" cy="16" r="2.5" fill="currentColor" /></svg>
+            <span id="musicLabel">Off</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="board-head">
+      <div class="seg" id="headerDifficult" role="group" aria-label="Dificuldade">
+        <button class="seg-btn" data-diff="facil">Fácil</button>
+        <button class="seg-btn" data-diff="medio">Médio</button>
+        <button class="seg-btn" data-diff="dificil">Difícil</button>
+      </div>
+    </div>
+
+    <main class="board-wrap">
+      <div class="board" id="board" aria-label="Jogo da memória: combine cada prática de autocuidado ao seu benefício"></div>
+    </main>
+
+    <section class="tip-banner" id="tipBanner" aria-live="polite">
+      <span class="tip-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+      </span>
+      <div class="tip-body">
+        <span class="tip-label">Dica de Autocuidado</span>
+        <p class="tip-text" id="tipText">Combine cada prática ao seu benefício para descobrir dicas.</p>
+      </div>
+    </section>
+
+    <div class="controls">
+      <button id="pauseBtn" class="btn btn-pause">PAUSAR</button>
+      <button id="restartBtn" class="btn btn-restart">RECOMEÇAR</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2026 Cuide-se! · Criado por <b>Elias Ramos da Rocha (SENAC CEP-R: Projeto Transforme-se)</b></p>
+  </footer>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <div class="overlay show" id="startOverlay" role="dialog" aria-modal="true" aria-label="Início">
+    <div class="overlay-card start-card">
+      <span class="title-badge big" aria-hidden="true">
+        <svg viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="28" fill="#002A54"/>
+          <circle cx="32" cy="32" r="22" fill="none" stroke="#E6007E" stroke-width="2.4"/>
+          <text x="32" y="39" font-family="sans-serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle">♥</text>
+        </svg>
+      </span>
+      <h2>Cuide-se!</h2>
+      <p class="start-sub">Combine cada prática de autocuidado ao seu benefício.</p>
+
+      <label class="field-label" for="nameInput">Digite seu Nome</label>
+      <input id="nameInput" class="name-input" type="text" maxlength="20" placeholder="Seu nome..." autocomplete="off" />
+
+      <span class="field-label">Escolha sua Dificuldade</span>
+      <div class="seg big-seg" id="startDifficult" role="group" aria-label="Dificuldade">
+        <button class="seg-btn" data-diff="facil">Fácil</button>
+        <button class="seg-btn" data-diff="medio">Médio</button>
+        <button class="seg-btn" data-diff="dificil">Difícil</button>
+      </div>
+
+      <button id="startBtn" class="btn btn-primary btn-block">COMEÇAR</button>
+      <button id="startLeaderboardBtn" class="btn btn-ghost btn-block">VER RANKING</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="pauseOverlay" role="dialog" aria-modal="true" aria-label="Jogo pausado">
+    <div class="overlay-card">
+      <span class="overlay-ico" aria-hidden="true">
+        <svg viewBox="0 0 64 64"><path d="M40 6a24 24 0 1 0 17 26 21 21 0 0 1-17-26z" fill="#cdb3e8" /><rect x="20" y="48" width="24" height="6" rx="3" fill="#7f5ab0" /></svg>
+      </span>
+      <h2>Pausado</h2>
+      <p>Respire fundo e continue quando estiver pronta(o).</p>
+      <button id="resumeBtn" class="btn btn-primary btn-block">CONTINUAR</button>
+      <button id="pauseRestartBtn" class="btn btn-ghost btn-block">RECOMEÇAR</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="victoryOverlay" role="dialog" aria-modal="true" aria-label="Parabéns">
+    <div class="overlay-card victory-card">
+      <span class="overlay-ico victory-ico" aria-hidden="true">
+        <svg viewBox="0 0 64 64"><path d="M32 55C18 45 10 37 10 27a12 12 0 0 1 22-7 12 12 0 0 1 22 7c0 10-8 18-22 28z" fill="#E6007E" opacity=".85" /><path d="M30 15c2-5 5-8 9-9-1 5-4 8-8 10z" fill="#002A54" /></svg>
+      </span>
+      <h2>Você completou!</h2>
+      <p class="victory-msg">Cuidar de você é a sua prioridade!</p>
+      <label class="field-label" for="victoryNameInput">Seu Nome</label>
+      <input id="victoryNameInput" class="name-input" type="text" maxlength="20" placeholder="Digite seu nome..." autocomplete="off" />
+      <div class="victory-stats">
+        <div class="vstat"><span>Tempo</span><b id="finalTime">00:00</b></div>
+        <div class="vstat"><span>Jogadas</span><b id="finalAttempts">0</b></div>
+        <div class="vstat"><span>Pontuação</span><b id="finalScore">0</b></div>
+      </div>
+      <div class="score-line">Pontuação do Ranking: <b id="rankScore">0</b></div>
+      <button id="saveBtn" class="btn btn-primary btn-block">SALVAR NO RANKING</button>
+      <button id="againBtn" class="btn btn-ghost btn-block">JOGAR NOVAMENTE</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="leaderboardOverlay" role="dialog" aria-modal="true" aria-label="Ranking">
+    <div class="overlay-card leaderboard-card">
+      <h2>Ranking</h2>
+      <p class="leaderboard-sub">Melhores pontuações de todos os jogadores</p>
+      <ol class="rank-list" id="rankList"></ol>
+      <button id="closeLeaderboardBtn" class="btn btn-primary btn-block">FECHAR</button>
+    </div>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>
