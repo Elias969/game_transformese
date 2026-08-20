@@ -525,17 +525,60 @@ body {
 }
 .score-line b { color: var(--pink); font-size: 1.05rem; }
 
-.leaderboard-card { width: min(92vw, 400px); }
-.leaderboard-sub { font-size: .8rem; margin: 0; }
+/* Janela do ranking */
+.leaderboard-card {
+  width: min(92vw, 400px);
+  max-height: 85vh;
+  overflow: hidden;
+}
+
+.leaderboard-sub {
+  font-size: .8rem;
+  margin: 0;
+}
+
+/* Lista completa com rolagem vertical */
 .rank-list {
   list-style: none;
   margin: 2px 0 6px;
-  padding: 0;
+  padding: 0 8px 0 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 7px;
+
+  /* Ativa a rolagem quando houver muitos jogadores */
+  max-height: 55vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 }
+
+/* Barra de rolagem no Chrome, Edge e Safari */
+.rank-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rank-list::-webkit-scrollbar-track {
+  background: rgba(0, 42, 84, .08);
+  border-radius: 8px;
+}
+
+.rank-list::-webkit-scrollbar-thumb {
+  background: var(--pink);
+  border-radius: 8px;
+}
+
+.rank-list::-webkit-scrollbar-thumb:hover {
+  background: #b80065;
+}
+
+/* Firefox */
+.rank-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pink) rgba(0, 42, 84, .08);
+}
+
 .rank-item {
   display: flex;
   align-items: center;
@@ -545,22 +588,81 @@ body {
   border-radius: 14px;
   padding: 9px 12px;
   font-weight: 600;
+  flex: none;
 }
+
 .rank-top {
   background: linear-gradient(140deg, #fff0f7, #ffffff);
   border-color: var(--pink-soft);
   box-shadow: 0 3px 10px rgba(230, 0, 126, .15);
 }
-.rank-medal { font-size: 1.05rem; width: 26px; text-align: center; flex: none; }
-.rank-color { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-.rank-name { flex: 1; text-align: left; color: var(--navy); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rank-detail { color: var(--ink-soft); font-size: .72rem; white-space: nowrap; }
-.rank-score { color: var(--pink); font-size: 1rem; }
+
+.rank-medal {
+  font-size: 1.05rem;
+  width: 26px;
+  text-align: center;
+  flex: none;
+}
+
+.rank-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.rank-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  color: var(--navy);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-detail {
+  color: var(--ink-soft);
+  font-size: .72rem;
+  white-space: nowrap;
+}
+
+.rank-score {
+  color: var(--pink);
+  font-size: 1rem;
+  flex: none;
+}
+
 .rank-empty {
   color: var(--ink-soft);
   font-weight: 600;
   text-align: center;
   padding: 12px;
+}
+
+/* Ajuste para telas pequenas */
+@media (max-width: 480px) {
+  .leaderboard-card {
+    max-height: 88vh;
+  }
+
+  .rank-list {
+    max-height: 58vh;
+  }
+
+  .rank-item {
+    gap: 6px;
+    padding: 8px 9px;
+  }
+
+  .rank-detail {
+    font-size: .65rem;
+  }
+
+  .rank-score {
+    font-size: .9rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
