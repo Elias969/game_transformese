@@ -347,8 +347,6 @@ async function saveScore() {
     .order('score', { ascending: false })
     .order('elapsed_seconds', { ascending: true })
     .order('created_at', { ascending: true })
-    .limit(10);
-
   if (error) {
     console.error('Erro ao carregar ranking:', error);
     return [];
