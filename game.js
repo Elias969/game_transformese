@@ -20,6 +20,7 @@ const pauseOverlay = document.getElementById('pauseOverlay');
 const victoryOverlay = document.getElementById('victoryOverlay');
 const startOverlay = document.getElementById('startOverlay');
 const leaderboardOverlay = document.getElementById('leaderboardOverlay');
+const howToPlayOverlay = document.getElementById('howToPlayOverlay');
 const finalTime = document.getElementById('finalTime');
 const finalScore = document.getElementById('finalScore');
 const finalAttempts = document.getElementById('finalAttempts');
@@ -493,6 +494,14 @@ saveBtn.addEventListener('click', () => {
 });
 
 document.getElementById('closeLeaderboardBtn').addEventListener('click', () => leaderboardOverlay.classList.remove('show'));
+
+document.getElementById('howToPlayBtn').addEventListener('click', () => {
+  howToPlayOverlay.classList.add('show');
+});
+
+document.getElementById('closeHowToPlayBtn').addEventListener('click', () => {
+  howToPlayOverlay.classList.remove('show');
+});
 
 /* --- Music --- */
 const MUSIC_MODES = ['off', 'piano', 'nature'];
