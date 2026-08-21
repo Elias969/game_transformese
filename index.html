@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cuide-se!2.0</title>
+  <title>Cuide-se 2.0!</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='%23002A54'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%23E6007E' stroke-width='2.4'/%3E%3Ctext x='32' y='37' font-family='sans-serif' font-size='12' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%E2%99%A5%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -86,7 +86,7 @@
   </div>
 
   <footer class="footer">
-    <p>© 2026 Cuide-se! · Criado por <b>Elias Ramos da Rocha</b></p>
+    <p>© 2026 Cuide-se! · Criado por <b>Elias Ramos da Rocha (SENAC CEP-R: Projeto Transforme-se)</b></p>
   </footer>
 
   <canvas id="confetti" aria-hidden="true"></canvas>
@@ -100,7 +100,7 @@
           <text x="32" y="39" font-family="sans-serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle">♥</text>
         </svg>
       </span>
-      <h2>Cuide-se!2.0</h2>
+      <h2>Cuide-se!</h2>
       <p class="start-sub">Combine cada prática de autocuidado ao seu benefício.</p>
 
       <label class="field-label" for="nameInput">Digite seu Nome</label>
@@ -115,6 +115,7 @@
 
       <button id="startBtn" class="btn btn-primary btn-block">COMEÇAR</button>
       <button id="startLeaderboardBtn" class="btn btn-ghost btn-block">VER RANKING</button>
+      <button id="howToPlayBtn" class="btn btn-ghost btn-block">COMO FUNCIONA O JOGO</button>
     </div>
   </div>
 
@@ -157,6 +158,31 @@
       <p class="leaderboard-sub">Ranking global confirmado pelo Supabase</p>
       <ol class="rank-list" id="rankList"></ol>
       <button id="closeLeaderboardBtn" class="btn btn-primary btn-block">FECHAR</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="howToPlayOverlay" role="dialog" aria-modal="true" aria-label="Como funciona o jogo">
+    <div class="overlay-card how-to-card">
+      <h2>Como funciona o jogo</h2>
+      <p class="how-to-intro">Encontre os pares e relacione cada prática de autocuidado ao seu benefício.</p>
+
+      <div class="how-to-section">
+        <h3>Como jogar</h3>
+        <p>Escolha uma dificuldade, vire duas cartas por vez e encontre os pares correspondentes. Uma jogada é contada sempre que duas cartas são viradas. O jogo termina quando todos os pares forem encontrados.</p>
+      </div>
+
+      <div class="how-to-section">
+        <h3>Como funciona a pontuação</h3>
+        <p>A pontuação do ranking considera três fatores:</p>
+        <div class="score-explanation">
+          <div><b>Tempo</b><span>Até 400 pontos. Quanto menos tempo, maior a pontuação.</span></div>
+          <div><b>Eficiência</b><span>Até 400 pontos. Quanto menos tentativas, maior a pontuação.</span></div>
+          <div><b>Dificuldade</b><span>Bônus de 0, 50 ou 100 pontos para Fácil, Médio e Difícil.</span></div>
+        </div>
+      </div>
+
+      <p class="how-to-note">A pontuação é salva no ranking global somente depois de ser confirmada pelo Supabase.</p>
+      <button id="closeHowToPlayBtn" class="btn btn-primary btn-block">ENTENDI</button>
     </div>
   </div>
 
