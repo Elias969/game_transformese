@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles-robusto.css" />
 </head>
 <body>
   <div class="blob blob-1" aria-hidden="true"></div>
@@ -86,7 +86,7 @@
   </div>
 
   <footer class="footer">
-    <p>© 2026 Cuide-se! · Criado por <b>Elias Ramos da Rocha (SENAC CEP-R: Projeto Transforme-se)</b></p>
+    <p>© 2026 Cuide-se! · Criado por <b>Elias Ramos da Rocha</b></p>
   </footer>
 
   <canvas id="confetti" aria-hidden="true"></canvas>
@@ -145,6 +145,7 @@
         <div class="vstat"><span>Pontuação</span><b id="finalScore">0</b></div>
       </div>
       <div class="score-line">Pontuação do Ranking: <b id="rankScore">0</b></div>
+      <p id="saveStatus" class="save-status" hidden aria-live="polite"></p>
       <button id="saveBtn" class="btn btn-primary btn-block">SALVAR NO RANKING</button>
       <button id="againBtn" class="btn btn-ghost btn-block">JOGAR NOVAMENTE</button>
     </div>
@@ -153,12 +154,12 @@
   <div class="overlay" id="leaderboardOverlay" role="dialog" aria-modal="true" aria-label="Ranking">
     <div class="overlay-card leaderboard-card">
       <h2>Ranking</h2>
-      <p class="leaderboard-sub">Melhores pontuações de todos os jogadores</p>
+      <p class="leaderboard-sub">Ranking global confirmado pelo Supabase</p>
       <ol class="rank-list" id="rankList"></ol>
       <button id="closeLeaderboardBtn" class="btn btn-primary btn-block">FECHAR</button>
     </div>
   </div>
 
-  <script type="module" src="game.js"></script>
+  <script type="module" src="game-robusto.js"></script>
 </body>
 </html>
