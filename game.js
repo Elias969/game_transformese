@@ -25,6 +25,7 @@ const finalScore = document.getElementById('finalScore');
 const finalAttempts = document.getElementById('finalAttempts');
 const rankScoreEl = document.getElementById('rankScore');
 const rankList = document.getElementById('rankList');
+const saveStatus = document.getElementById('saveStatus');
 const musicBtn = document.getElementById('musicBtn');
 const musicLabel = document.getElementById('musicLabel');
 const confettiCanvas = document.getElementById('confetti');
@@ -211,9 +212,38 @@ function showTip() {
   tipBanner.classList.add('pop');
 }
 
+/*
+ * Pontuação do ranking
+ *
+ * A pontuação é formada por três componentes equilibrados:
+ * - tempo: até 400 pontos; quanto menor o tempo, maior a pontuação;
+ * - eficiência: até 400 pontos; menos tentativas gera mais pontos;
+ * - dificuldade: bônus fixo de 0, 50 ou 100 pontos.
+ *
+ * O resultado é sempre inteiro e nunca fica negativo.
+ */
 function rankScore() {
-  const remainingBonus = Math.max(0, S.config.limit - S.seconds);
-  return S.matched * 5 + remainingBonus - S.attempts;
+  const config = S.config;
+  const pairs = config.pairs;
+  const attempts = Math.max(S.attempts, pairs);
+  const seconds = Math.max(0, S.seconds);
+
+  // 400 pontos para terminar no instante zero; zero após atingir o limite.
+  const timeRatio = Math.min(seconds / config.limit, 1);
+  const timePoints = Math.round((1 - timeRatio) * 400);
+
+  // 400 pontos com o mínimo possível de tentativas: uma por par.
+  // Tentativas extras reduzem a pontuação proporcionalmente.
+  const efficiencyRatio = Math.min(pairs / attempts, 1);
+  const efficiencyPoints = Math.round(efficiencyRatio * 400);
+
+  const difficultyBonus = {
+    facil: 0,
+    medio: 50,
+    dificil: 100,
+  }[difficulty] || 0;
+
+  return Math.max(0, timePoints + efficiencyPoints + difficultyBonus);
 }
 
 function win() {
@@ -309,49 +339,93 @@ async function ensureSupabaseUser() {
   return data.user;
 }
 
+let saveInProgress = false;
+
+function setSaveStatus(message, type = 'info') {
+  if (!saveStatus) return;
+  saveStatus.textContent = message;
+  saveStatus.dataset.type = type;
+  saveStatus.hidden = !message;
+}
+
+async function getMyRanking() {
+  const { data, error } = await supabase.rpc('get_my_ranking');
+  if (error) throw error;
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row || !Number.isFinite(Number(row.rank))) {
+    throw new Error('A pontuação foi enviada, mas a posição não foi confirmada.');
+  }
+
+  return {
+    rank: Number(row.rank),
+    totalPlayers: Number(row.total_players),
+    score: Number(row.score),
+  };
+}
+
 async function saveScore() {
+  if (saveInProgress || !S.won) return;
+
   const name = (victoryNameInput.value.trim() || 'Jogador(a)').slice(0, 20);
+  const score = Math.max(0, Math.floor(rankScore()));
+  saveInProgress = true;
   saveBtn.disabled = true;
+  setSaveStatus('Salvando e confirmando no ranking...', 'info');
 
   try {
     const user = await ensureSupabaseUser();
-
-    const { error } = await supabase
+    const { data: savedRow, error } = await supabase
       .from('ranking_scores')
-      .insert({
-        user_id: user.id,
-        player_name: name,
-        score: Math.max(0, Math.floor(rankScore())),
-        pairs: S.matched,
-        attempts: S.attempts,
-        elapsed_seconds: S.seconds,
-        difficulty,
-      });
+      .upsert(
+        {
+          user_id: user.id,
+          player_name: name,
+          score,
+          pairs: S.matched,
+          attempts: S.attempts,
+          elapsed_seconds: S.seconds,
+          difficulty,
+        },
+        { onConflict: 'user_id' }
+      )
+      .select('user_id, score, pairs, attempts, elapsed_seconds, difficulty')
+      .single();
 
     if (error) throw error;
+    if (!savedRow || savedRow.user_id !== user.id || Number(savedRow.score) !== score) {
+      throw new Error('O Supabase não confirmou os dados enviados.');
+    }
 
+    const position = await getMyRanking();
     playerName = name;
     localStorage.setItem(LS_NAME, name);
+    setSaveStatus(
+      `Pontuação confirmada: ${position.rank}º lugar de ${position.totalPlayers} jogador(es).`,
+      'success'
+    );
     await showLeaderboard();
   } catch (error) {
-    console.error('Erro ao salvar pontuação:', error);
-    alert('Não foi possível salvar a pontuação. Verifique a conexão.');
+    console.error('Erro confirmado ao salvar ranking:', error);
+    setSaveStatus(
+      'Não foi possível confirmar sua entrada no ranking. A pontuação não será considerada salva.',
+      'error'
+    );
   } finally {
+    saveInProgress = false;
     saveBtn.disabled = false;
   }
 }
-  async function getScores() {
+async function getScores() {
   const { data, error } = await supabase
     .from('ranking_scores')
-    .select('player_name, score, pairs, attempts, elapsed_seconds, difficulty, created_at')
+    .select('user_id, player_name, score, pairs, attempts, elapsed_seconds, difficulty, created_at')
     .order('score', { ascending: false })
     .order('elapsed_seconds', { ascending: true })
-    .order('created_at', { ascending: true })
-  if (error) {
-    console.error('Erro ao carregar ranking:', error);
-    return [];
-  }
+    .order('attempts', { ascending: true })
+    .order('created_at', { ascending: true });
 
+  if (error) throw error;
   return data || [];
 }
 
@@ -361,32 +435,37 @@ async function showLeaderboard() {
   leaderboardOverlay.classList.add('show');
   rankList.innerHTML = '<li class="rank-empty">Carregando ranking...</li>';
 
-  const scores = await getScores();
-  rankList.innerHTML = '';
+  try {
+    const scores = await getScores();
+    rankList.innerHTML = '';
 
-  if (!scores.length) {
-    const li = document.createElement('li');
-    li.className = 'rank-empty';
-    li.textContent = 'Nenhum resultado ainda. Seja a primeira!';
-    rankList.appendChild(li);
-    return;
+    if (!scores.length) {
+      const li = document.createElement('li');
+      li.className = 'rank-empty';
+      li.textContent = 'Nenhum resultado ainda. Seja a primeira!';
+      rankList.appendChild(li);
+      return;
+    }
+
+    scores.forEach((s, i) => {
+      const li = document.createElement('li');
+      li.className = 'rank-item';
+      if (i === 0) li.classList.add('rank-top');
+
+      li.innerHTML = `
+        <span class="rank-medal">${i + 1}º</span>
+        <span class="rank-color" style="background:${DIFF_COLOR[s.difficulty] || '#E6007E'}"></span>
+        <span class="rank-name"></span>
+        <span class="rank-detail">${s.pairs} pares · ${s.attempts} tent.</span>
+        <b class="rank-score">${s.score}</b>`;
+
+      li.querySelector('.rank-name').textContent = s.player_name;
+      rankList.appendChild(li);
+    });
+  } catch (error) {
+    console.error('Erro ao carregar ranking:', error);
+    rankList.innerHTML = '<li class="rank-empty">Não foi possível carregar o ranking. Tente novamente.</li>';
   }
-
-  scores.forEach((s, i) => {
-    const li = document.createElement('li');
-    li.className = 'rank-item';
-    if (i === 0) li.classList.add('rank-top');
-
-    li.innerHTML = `
-      <span class="rank-medal">${i + 1}º</span>
-      <span class="rank-color" style="background:${DIFF_COLOR[s.difficulty] || '#E6007E'}"></span>
-      <span class="rank-name"></span>
-      <span class="rank-detail">${s.pairs} pares · ${s.attempts} tent.</span>
-      <b class="rank-score">${s.score}</b>`;
-
-    li.querySelector('.rank-name').textContent = s.player_name;
-    rankList.appendChild(li);
-  });
 }
 
 /* --- Difficulty selectors --- */
