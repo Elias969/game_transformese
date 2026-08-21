@@ -591,6 +591,74 @@ body {
   border: 1px solid #e2aaaa;
 }
 
+.how-to-card {
+  width: min(92vw, 460px);
+  align-items: stretch;
+  text-align: left;
+  gap: 10px;
+}
+
+.how-to-card h2 {
+  text-align: center;
+}
+
+.how-to-intro {
+  text-align: center;
+  margin-bottom: 4px !important;
+}
+
+.how-to-section {
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid var(--purple-light);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.how-to-section h3 {
+  margin: 0 0 5px;
+  color: var(--navy);
+  font-size: .95rem;
+}
+
+.how-to-section p {
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.score-explanation {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.score-explanation div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #fff0f7, #eef4ff);
+}
+
+.score-explanation b {
+  color: var(--pink);
+  font-size: .78rem;
+}
+
+.score-explanation span {
+  color: var(--ink-soft);
+  font-size: .75rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.how-to-note {
+  text-align: center;
+  color: var(--purple) !important;
+  font-size: .78rem !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blob { animation: none; }
   .card { animation: none; }
